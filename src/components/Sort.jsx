@@ -1,22 +1,42 @@
-import {useState} from "react";
+import React from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {setSort} from "../redux/slices/filterSlice";
 
-function Sort({value, onChangeSort}) {
-	const typesSort = [
-		{name: 'популярности (К лучшему)', sortProperty: '-rating'},
-		{name: 'популярности (К худшему)', sortProperty: 'rating'},
-		{name: 'цене (С самго дешевого)', sortProperty: '-price'},
-		{name: 'цене (С самого дорогого)', sortProperty: 'price'},
-		{name: 'алфавиту (От А до Я)', sortProperty: '-title'},
-		{name: 'алфавиту (От Я до А)', sortProperty: 'title'},
+export const typesSort = [
+	{name: 'популярности (К лучшему)', sortProperty: '-rating'},
+	{name: 'популярности (К худшему)', sortProperty: 'rating'},
+	{name: 'цене (С самго дешевого)', sortProperty: '-price'},
+	{name: 'цене (С самого дорогого)', sortProperty: 'price'},
+	{name: 'алфавиту (От А до Я)', sortProperty: '-title'},
+	{name: 'алфавиту (От Я до А)', sortProperty: 'title'},
+]
 
-	]
-	const [isVisible, setIsVisible] = useState(false)
-	const onClickListItem = (i) => {
-		onChangeSort(i)
+function Sort() {
+	const dispatch = useDispatch()
+	const sort = useSelector((state) => state.filter.sort)
+	const sortRef = React.useRef()
+
+	const [isVisible, setIsVisible] = React.useState(false)
+	const onClickListItem = (obj) => {
+		dispatch(setSort(obj))
 		setIsVisible(false)
 	}
+
+	React.useEffect(() => {
+		const handleClickOutside = (event) => {
+			if(!event.path.includes(sortRef.current)) {
+				setIsVisible(false)
+			}
+		}
+		document.body.addEventListener('click', handleClickOutside)
+		return () => {
+			document.body.removeEventListener('click', handleClickOutside)
+		}
+	}, [])
+
+
 	return (
-		<div className="sort">
+		<div ref={sortRef} className="sort">
 			<div className="sort__label">
 				<svg
 					width="10"
@@ -33,7 +53,7 @@ function Sort({value, onChangeSort}) {
 				<b>Сортировка по:</b>
 				<span onClick={() => {
 					setIsVisible(!isVisible)
-				}}>{value.name}</span>
+				}}>{sort.name}</span>
 			</div>
 			{isVisible && (
 				<div className="sort__popup">
@@ -41,7 +61,7 @@ function Sort({value, onChangeSort}) {
 						{typesSort.map((obj, i) => (
 							<li
 								key={i}
-								className={value.sortProperty === obj.sortProperty ? 'active' : '0'}
+								className={sort.sortProperty === obj.sortProperty ? 'active' : '0'}
 								onClick={() => onClickListItem(obj)}>
 								{obj.name}
 							</li>

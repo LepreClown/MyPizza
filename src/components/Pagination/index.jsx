@@ -1,10 +1,11 @@
 import styles from './Pagination.module.scss'
 import ReactPaginate from "react-paginate";
 
-const Pagination = ({onChangePage}) => {
+const Pagination = ({currentPage,onChangePage}) => {
 	return (
 		<ReactPaginate
 			pageCount={3}
+			forcePage={currentPage -1}
 			pageRangeDisplayed={4}
 			className={styles.root}
 			breakLabel={'...'}
